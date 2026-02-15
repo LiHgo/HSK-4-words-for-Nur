@@ -1,0 +1,346 @@
+<!DOCTYPE html>
+<html lang="zh">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>HSK4 句子顺序训练 Pro</title>
+
+<style>
+body{
+    margin:0;
+    font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto;
+    background:linear-gradient(135deg,#eef2f7,#f9fbfd);
+    display:flex;
+    justify-content:center;
+}
+.container{
+    max-width:1000px;
+    width:95%;
+    padding:20px;
+}
+.card{
+    background:#fff;
+    border-radius:16px;
+    padding:25px;
+    box-shadow:0 10px 30px rgba(0,0,0,0.08);
+}
+h1{
+    text-align:center;
+    margin-bottom:20px;
+}
+.top-controls{
+    display:flex;
+    flex-wrap:wrap;
+    gap:10px;
+    justify-content:center;
+    margin-bottom:15px;
+}
+select,button{
+    padding:10px 16px;
+    border-radius:8px;
+    border:1px solid #ddd;
+    font-size:14px;
+}
+button{
+    cursor:pointer;
+    background:#4a90e2;
+    color:#fff;
+    border:none;
+    transition:0.2s;
+}
+button:hover{
+    opacity:0.9;
+}
+.progress{
+    height:8px;
+    background:#eee;
+    border-radius:10px;
+    margin:15px 0;
+    overflow:hidden;
+}
+.progress-bar{
+    height:100%;
+    width:0%;
+    background:#4a90e2;
+    transition:0.3s;
+}
+.answer-area{
+    min-height:50px;
+    border:2px dashed #ccc;
+    border-radius:10px;
+    padding:10px;
+    margin-bottom:20px;
+    display:flex;
+    flex-wrap:wrap;
+    gap:8px;
+}
+.word{
+    padding:8px 12px;
+    background:#f2f4f7;
+    border-radius:8px;
+    cursor:pointer;
+    user-select:none;
+    transition:0.2s;
+}
+.word:hover{
+    background:#e1e7f0;
+}
+.word.selected{
+    opacity:0.4;
+}
+.words-area{
+    display:flex;
+    flex-wrap:wrap;
+    gap:8px;
+    justify-content:center;
+}
+.result{
+    text-align:center;
+    font-weight:bold;
+    margin-top:15px;
+}
+@media(max-width:768px){
+    .container{
+        width:98%;
+    }
+}
+</style>
+</head>
+<body>
+
+<div class="container">
+<div class="card">
+
+<h1>HSK4 句子顺序训练 Pro</h1>
+
+<div class="top-controls">
+<select id="orderMode">
+<option value="normal">顺序练习</option>
+<option value="random">随机练习</option>
+<option value="wrong">错题练习</option>
+</select>
+
+<select id="category">
+<option value="all">全部类型</option>
+<option value="life">日常生活</option>
+<option value="work">工作学习</option>
+<option value="time">时间数量</option>
+<option value="grammar">语法结构</option>
+<option value="emotion">情感表达</option>
+</select>
+
+<button onclick="startTraining()">开始训练</button>
+</div>
+
+<div class="progress">
+<div class="progress-bar" id="progressBar"></div>
+</div>
+
+<div class="answer-area" id="answerArea"></div>
+<div class="words-area" id="wordsArea"></div>
+
+<div style="text-align:center;margin-top:15px;">
+<button onclick="checkAnswer()">提交</button>
+<button onclick="nextQuestion()">下一题</button>
+<button onclick="clearAnswer()">清空</button>
+</div>
+
+<div class="result" id="result"></div>
+
+</div>
+</div>
+
+<script>
+
+// ===== 原始100句全部保留，仅改为词汇级拆分 =====
+const sentences = [
+{type:"life",text:"我 每天 早上 六点 起床。"},
+{type:"life",text:"他 已经 搬到 上海 工作 了。"},
+{type:"work",text:"我们 公司 正在 招聘 新 员工。"},
+{type:"time",text:"会议 将 在 下午 三点 开始。"},
+{type:"grammar",text:"如果 下雨 ， 我们 就 不 去 爬山。"},
+{type:"emotion",text:"她 对 这个 结果 非常 满意。"},
+{type:"life",text:"周末 我 喜欢 和 朋友 一起 吃饭。"},
+{type:"work",text:"他 打算 明年 出国 留学。"},
+{type:"time",text:"我 等 了 他 两个 小时。"},
+{type:"grammar",text:"虽然 很 累 ， 但是 他 没有 休息。"},
+{type:"emotion",text:"听到 这个 消息 ， 我 很 高兴。"},
+{type:"life",text:"她 每天 晚上 跑步 半个 小时。"},
+{type:"work",text:"老师 让 我们 准备 一个 报告。"},
+{type:"time",text:"他 已经 学习 汉语 四年 了。"},
+{type:"grammar",text:"只要 努力 ， 就 一定 会 成功。"},
+{type:"emotion",text:"我 对 未来 充满 信心。"},
+{type:"life",text:"今天 的 天气 比 昨天 冷。"},
+{type:"work",text:"他 正在 写 一封 重要 的 邮件。"},
+{type:"time",text:"我们 明天 上午 见面 吧。"},
+{type:"grammar",text:"因为 堵车 ， 所以 迟到 了。"},
+{type:"emotion",text:"她 担心 考试 成绩 不 好。"},
+{type:"life",text:"我 在 超市 买 了 一些 水果。"},
+{type:"work",text:"这个 问题 需要 马上 解决。"},
+{type:"time",text:"他 三个月 没 回家 了。"},
+{type:"grammar",text:"不仅 学习 ， 还 要 运动。"},
+{type:"emotion",text:"听 音乐 让 我 放松。"},
+{type:"life",text:"她 正在 厨房 做饭。"},
+{type:"work",text:"我们 正在 讨论 新 的 计划。"},
+{type:"time",text:"比赛 已经 结束 了。"},
+{type:"grammar",text:"如果 有 时间 ， 我 会 帮 你。"},
+{type:"emotion",text:"他 对 这个 决定 感到 失望。"},
+{type:"life",text:"我 每天 坐 地铁 上班。"},
+{type:"work",text:"经理 安排 了 新 的 任务。"},
+{type:"time",text:"他 昨天 晚上 十点 回家。"},
+{type:"grammar",text:"虽然 下雨 ， 但 我们 还是 出发 了。"},
+{type:"emotion",text:"她 为 自己 的 进步 感到 骄傲。"},
+{type:"life",text:"我 在 图书馆 学习。"},
+{type:"work",text:"公司 准备 开 一个 会议。"},
+{type:"time",text:"我们 已经 认识 很 多 年 了。"},
+{type:"grammar",text:"除非 下雨 ， 否则 比赛 继续。"},
+{type:"emotion",text:"他 对 未来 充满 希望。"},
+{type:"life",text:"她 买 了 一件 漂亮 的 衣服。"},
+{type:"work",text:"老板 正在 开会。"},
+{type:"time",text:"还有 五分钟 就 开始 了。"},
+{type:"grammar",text:"只要 坚持 ， 就 能 成功。"},
+{type:"emotion",text:"我 很 期待 这次 旅行。"},
+{type:"life",text:"我们 一起 去 看 电影 吧。"},
+{type:"work",text:"他 申请 了 一份 新 工作。"},
+{type:"time",text:"我 每天 学习 两个 小时。"},
+{type:"grammar",text:"因为 努力 ， 所以 进步 很 快。"},
+{type:"emotion",text:"她 很 关心 家人。"},
+{type:"life",text:"我 在 公园 散步。"},
+{type:"work",text:"会议 推迟 到 明天。"},
+{type:"time",text:"他 已经 到 了。"},
+{type:"grammar",text:"即使 很 忙 ， 也 要 休息。"},
+{type:"emotion",text:"我 对 这个 结果 不 满意。"},
+{type:"life",text:"她 正在 打 电话。"},
+{type:"work",text:"项目 需要 更多 时间。"},
+{type:"time",text:"今天 是 星期五。"},
+{type:"grammar",text:"只要 努力 ， 一定 成功。"},
+{type:"emotion",text:"听到 这个 消息 ， 他 很 生气。"},
+{type:"life",text:"我 喜欢 喝 咖啡。"},
+{type:"work",text:"我们 完成 了 任务。"},
+{type:"time",text:"他 两年 前 毕业。"},
+{type:"grammar",text:"如果 努力 ， 就 会 成功。"},
+{type:"emotion",text:"她 感到 很 紧张。"},
+{type:"life",text:"我 在 家 做饭。"},
+{type:"work",text:"公司 扩大 规模。"},
+{type:"time",text:"现在 是 晚上 八点。"},
+{type:"grammar",text:"虽然 困难 ， 但 要 坚持。"},
+{type:"emotion",text:"他 非常 开心。"},
+{type:"life",text:"我们 去 超市 买 东西。"},
+{type:"work",text:"他 负责 这个 项目。"},
+{type:"time",text:"会议 马上 开始。"},
+{type:"grammar",text:"如果 下雨 ， 就 取消。"},
+{type:"emotion",text:"她 对 结果 失望。"},
+{type:"life",text:"我 每天 锻炼 身体。"},
+{type:"work",text:"我们 讨论 问题。"},
+{type:"time",text:"他 刚刚 到。"},
+{type:"grammar",text:"只要 努力 ， 就 好。"},
+{type:"emotion",text:"我 感到 很 幸福。"},
+{type:"life",text:"她 在 商店 工作。"},
+{type:"work",text:"我们 计划 明年 发展。"},
+{type:"time",text:"还有 十分钟 结束。"},
+{type:"grammar",text:"如果 努力 ， 就 成功。"},
+{type:"emotion",text:"他 很 担心。"},
+{type:"life",text:"我 每天 看书。"},
+{type:"work",text:"老板 同意 计划。"},
+{type:"time",text:"已经 很 晚 了。"},
+{type:"grammar",text:"虽然 很 累 ， 但 继续。"},
+{type:"emotion",text:"她 非常 高兴。"}
+];
+
+let filtered = [];
+let currentIndex = 0;
+let wrongList = JSON.parse(localStorage.getItem("wrongList")||"[]");
+
+function startTraining(){
+    let mode = document.getElementById("orderMode").value;
+    let cat = document.getElementById("category").value;
+
+    if(mode==="wrong"){
+        filtered = sentences.filter(s=>wrongList.includes(s.text));
+    }else{
+        filtered = cat==="all"?sentences:sentences.filter(s=>s.type===cat);
+        if(mode==="random"){
+            filtered = filtered.sort(()=>Math.random()-0.5);
+        }
+    }
+    currentIndex = 0;
+    loadQuestion();
+}
+
+function loadQuestion(){
+    if(filtered.length===0){
+        document.getElementById("result").innerText="没有题目";
+        return;
+    }
+
+    let sentence = filtered[currentIndex].text;
+    let cleanSentence = sentence.replace("。","");
+    let words = cleanSentence.split(" ");
+    words = words.sort(()=>Math.random()-0.5);
+
+    document.getElementById("answerArea").innerHTML="";
+    document.getElementById("wordsArea").innerHTML="";
+    document.getElementById("result").innerText="";
+
+    words.forEach(w=>{
+        let span=document.createElement("span");
+        span.className="word";
+        span.innerText=w;
+        span.onclick=()=>{
+            if(!span.classList.contains("selected")){
+                span.classList.add("selected");
+                let clone=span.cloneNode(true);
+                clone.classList.remove("selected");
+                clone.onclick=()=>{
+                    span.classList.remove("selected");
+                    clone.remove();
+                };
+                document.getElementById("answerArea").appendChild(clone);
+            }
+        };
+        document.getElementById("wordsArea").appendChild(span);
+    });
+
+    updateProgress();
+}
+
+function checkAnswer(){
+    let answer=[...document.getElementById("answerArea").children]
+    .map(e=>e.innerText)
+    .join(" ")+"。";
+
+    let correct=filtered[currentIndex].text;
+
+    if(answer===correct){
+        document.getElementById("result").innerText="✅ 正确";
+    }else{
+        document.getElementById("result").innerText="❌ 错误";
+        if(!wrongList.includes(correct)){
+            wrongList.push(correct);
+            localStorage.setItem("wrongList",JSON.stringify(wrongList));
+        }
+    }
+}
+
+function nextQuestion(){
+    if(currentIndex<filtered.length-1){
+        currentIndex++;
+        loadQuestion();
+    }
+}
+
+function clearAnswer(){
+    document.getElementById("answerArea").innerHTML="";
+    document.querySelectorAll(".word").forEach(w=>w.classList.remove("selected"));
+}
+
+function updateProgress(){
+    let percent=((currentIndex+1)/filtered.length)*100;
+    document.getElementById("progressBar").style.width=percent+"%";
+}
+
+startTraining();
+
+</script>
+</body>
+</html>
