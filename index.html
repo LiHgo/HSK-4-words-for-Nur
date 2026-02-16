@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>HSK4 句子顺序训练 Pro</title>
+<title>HSK4 句子练习</title>
 
 <style>
 body{
@@ -111,22 +111,23 @@ button:hover{
 <div class="container">
 <div class="card">
 
-<h1>HSK4 句子顺序训练 Pro</h1>
+<h1>HSK4 句子训练</h1>
 
 <div class="top-controls">
 <select id="orderMode">
-<option value="normal">顺序练习</option>
-<option value="random">随机练习</option>
-<option value="wrong">错题练习</option>
+<option value="normal">顺序 Sequential</option>
+<option value="random">随机 Random</option>
+<option value="wrong">错题 Wrong</option>
 </select>
 
 <select id="category">
-<option value="all">全部类型</option>
-<option value="life">日常生活</option>
-<option value="work">工作学习</option>
-<option value="time">时间数量</option>
-<option value="grammar">语法结构</option>
-<option value="emotion">情感表达</option>
+<option value="all">全部类型 All</option>
+<option value="life">日常生活 life</option>
+<option value="work">工作学习 work</option>
+<option value="time">时间数量 time</option>
+<option value="grammar">语法结构 grammar</option>
+<option value="emotion">情感表达 emotion</option>
+<option value="hsk4">四级训练 hsk4</option>
 </select>
 
 <button onclick="startTraining()">开始训练</button>
@@ -140,9 +141,9 @@ button:hover{
 <div class="words-area" id="wordsArea"></div>
 
 <div style="text-align:center;margin-top:15px;">
-<button onclick="checkAnswer()">提交</button>
-<button onclick="nextQuestion()">下一题</button>
-<button onclick="clearAnswer()">清空</button>
+<button onclick="checkAnswer()">提交 commit</button>
+<button onclick="nextQuestion()">下一题 next</button>
+<button onclick="clearAnswer()">清空 clear</button>
 </div>
 
 <div class="result" id="result"></div>
@@ -244,7 +245,57 @@ const sentences = [
 {type:"work",text:"老板 同意 计划。"},
 {type:"time",text:"已经 很 晚 了。"},
 {type:"grammar",text:"虽然 很 累 ， 但 继续。"},
-{type:"emotion",text:"她 非常 高兴。"}
+{type:"emotion",text:"她 非常 高兴。"},
+{type:"hsk4",text:"虽然 天气 很 冷 ， 但是 他 还是 去 跑步。"},
+{type:"hsk4",text:"虽然 工作 很 忙 ， 但是 我 每天 坚持 学习。"},
+{type:"hsk4",text:"虽然 下雨 了 ， 但是 比赛 没有 取消。"},
+{type:"hsk4",text:"虽然 时间 不 多 ， 但是 我们 完成 了 任务。"},
+{type:"hsk4",text:"虽然 他 生病 了 ， 但是 还 去 上班。"},
+{type:"hsk4",text:"因为 今天 堵车 ， 所以 我 迟到 了。"},
+{type:"hsk4",text:"因为 天气 不好 ， 所以 航班 取消 了。"},
+{type:"hsk4",text:"因为 他 努力 学习 ， 所以 成绩 提高 了。"},
+{type:"hsk4",text:"因为 没有 时间 ， 所以 不能 参加 活动。"},
+{type:"hsk4",text:"因为 身体 不 舒服 ， 所以 请假 了。"},
+{type:"hsk4",text:"如果 明天 下雨 ， 我们 就 不 去 公园。"},
+{type:"hsk4",text:"如果 有 时间 ， 就 一起 吃饭。"},
+{type:"hsk4",text:"如果 努力 ， 就 会 成功。"},
+{type:"hsk4",text:"如果 太 累 ， 就 早点 休息。"},
+{type:"hsk4",text:"如果 找不到 ， 可以 打电话。"},
+{type:"hsk4",text:"他 一边 听 音乐 ， 一边 做 作业。"},
+{type:"hsk4",text:"我 一边 走路 ， 一边 打电话。"},
+{type:"hsk4",text:"她 一边 做饭 ， 一边 看 电视。"},
+{type:"hsk4",text:"孩子 一边 笑 ， 一边 跑。"},
+{type:"hsk4",text:"他 一边 喝 咖啡 ， 一边 工作。"},
+{type:"hsk4",text:"他 不但 会 说 中文 ， 而且 会 说 英语。"},
+{type:"hsk4",text:"这家 餐厅 不但 环境 好 ， 而且 服务 很 好。"},
+{type:"hsk4",text:"她 不但 漂亮 ， 而且 很 聪明。"},
+{type:"hsk4",text:"这个 工作 不但 有意思 ， 而且 收入 不错。"},
+{type:"hsk4",text:"他 不但 帮助 我 ， 而且 给 了 建议。"},
+{type:"hsk4",text:"请 把 门 关上。"},
+{type:"hsk4",text:"他 把 手机 忘在 家里 了。"},
+{type:"hsk4",text:"我 把 作业 做完 了。"},
+{type:"hsk4",text:"她 把 衣服 洗干净 了。"},
+{type:"hsk4",text:"请 把 名字 写清楚。"},
+{type:"hsk4",text:"书 被 他 拿走 了。"},
+{type:"hsk4",text:"手机 被 我 弄坏 了。"},
+{type:"hsk4",text:"门 被 风 吹开 了。"},
+{type:"hsk4",text:"作业 被 老师 批改 了。"},
+{type:"hsk4",text:"计划 被 取消 了。"},
+{type:"hsk4",text:"天气 越来越 冷 了。"},
+{type:"hsk4",text:"他 的 中文 越来越 好 了。"},
+{type:"hsk4",text:"生活 越来越 方便。"},
+{type:"hsk4",text:"城市 越来越 热闹。"},
+{type:"hsk4",text:"她 工作 越来越 忙。"},
+{type:"hsk4",text:"他 先 洗手 ， 再 吃饭。"},
+{type:"hsk4",text:"除了 学习 以外 ， 他 还 打工。"},
+{type:"hsk4",text:"她 既 聪明 又 努力。"},
+{type:"hsk4",text:"他 对 工作 很 认真。"},
+{type:"hsk4",text:"我 已经 习惯 这里 的 生活。"},
+{type:"hsk4",text:"他 决定 以后 每天 锻炼。"},
+{type:"hsk4",text:"我们 应该 保护 环境。"},
+{type:"hsk4",text:"她 对 这个 结果 很 满意。"},
+{type:"hsk4",text:"他 终于 找到 了 工作。"},
+{type:"hsk4",text:"我 打算 明年 去 中国 旅行。"}
 ];
 
 let filtered = [];
